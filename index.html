@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 50%;height: 400px; border:1px solid black; margin: auto; text-align: center; }
+        input, button { margin: 5px; padding: 8px; }
+        .warning { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Budget Tracker</h2>
+         <br> <br>
+        <input type="text" id="category" placeholder="Enter Category"> <br> <br>
+        <input type="number" id="budget" placeholder="Set Budget"> <br> <br>
+        <button onclick="addCategory()">Add Category</button> <br> <br>
+        <h3>Expenses</h3>
+        <ul id="budgetList"></ul>
+    </div>
+    
+    <script>
+        let budgets = {};
+        function addCategory() {
+            let category = document.getElementById('category').value;
+            let budget = parseFloat(document.getElementById('budget').value);
+            
+            if (category && budget) {
+                budgets[category] = { budget: budget, spent: 0 };
+                updateBudgetList();
+            }
+        }
+
+        function updateBudgetList() {
+            let list = document.getElementById('budgetList');
+            list.innerHTML = '';
+            
+            for (let category in budgets) {
+                let item = document.createElement('li');
+                item.innerHTML = `${category}: $${budgets[category].spent} / $${budgets[category].budget} `+
+                        `<input type='number' placeholder='Add Expense' id='expense-${category}'>` +
+                    `<button onclick="addExpense('${category}')">Add</button>`;
+                
+                if (budgets[category].spent >= budgets[category].budget * 0.9) {
+                    item.classList.add('warning');
+                }
+                
+                list.appendChild(item);
+            }
+        }
+
+        function addExpense(category) {
+            let expense = parseFloat(document.getElementById(`expense-${category}`).value);
+            if (!isNaN(expense)) {
+                budgets[category].spent += expense;
+                updateBudgetList();
+                checkBudget(category);
+            }
+        }
+        
+        function checkBudget(category) {
+            let budgetData = budgets[category];
+            if (budgetData.spent >= budgetData.budget) {
+                alert(`Warning! ${category} budget exceeded!`);
+            } else if (budgetData.spent >= budgetData.budget * 0.9) {
+                alert(`Caution! ${category} budget is almost full.`);
+            }
+        }
+    </script>
+</body>
+</html>
